@@ -20,7 +20,14 @@ function App() {
   }
 
   if (room.status === 'playing') {
-    return <FarmScreen room={room} player={player} players={roomState.players} />
+    return (
+      <FarmScreen
+        room={room}
+        player={player}
+        players={roomState.players}
+        onReplay={roomState.returnToLobby}
+      />
+    )
   }
 
   return (

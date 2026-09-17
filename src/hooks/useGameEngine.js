@@ -6,6 +6,7 @@ import {
   calculateFertilizedEndTime,
   createInitialPlots,
   createInitialTrees,
+  makeId,
 } from '../utils/game.js'
 
 export function useGameEngine({ room, player, roomPlayers }) {
@@ -107,7 +108,7 @@ export function useGameEngine({ room, player, roomPlayers }) {
     channelRef.current = channel
 
     const syncTimer = window.setInterval(() => {
-      const payload = { id: player.id, nickname: player.nickname, cash, inventory }
+      const payload = { id: player.id, nickname: player.nickname, cash, inventory, ...stats }
       channel.send({ type: 'broadcast', event: 'player_state', payload })
       updatePlayerStats(player.id, {
         cash,
@@ -167,24 +168,24 @@ export function useGameEngine({ room, player, roomPlayers }) {
 
   const waterSelected = useCallback(() => {
     if (selectedTarget.type !== 'plot' || hasEnded) return false
-    let watered = false
+    const target = plots.find((plot) => plot.id === selectedTarget.id)
+    if (!target?.crop || target.crop.startedAt) return false
+    const crop = CROPS.find((item) => item.id === target.crop.cropId)
     setPlots((current) => current.map((plot) => {
-      if (plot.id !== selectedTarget.id || !plot.crop || plot.crop.startedAt) return plot
-      const crop = CROPS.find((item) => item.id === plot.crop.cropId)
-      watered = true
+      if (plot.id !== selectedTarget.id) return plot
       return {
         ...plot,
         crop: { ...plot.crop, startedAt: now, endsAt: now + crop.growSeconds * 1000 },
       }
     }))
-    return watered
-  }, [hasEnded, now, selectedTarget])
+    return true
+  }, [hasEnded, now, plots, selectedTarget])
 
   const buyTree = useCallback((treeId) => {
     const config = TREES.find((item) => item.id === treeId)
     if (!config || cash < config.price || hasEnded || trees.some((tree) => tree.treeId === treeId)) return false
     setCash((current) => current - config.price)
-    const instanceId = `${treeId}-${crypto.randomUUID()}`
+    const instanceId = `${treeId}-${makeId()}`
     setTrees((current) => [...current, {
       instanceId,
       treeId,
@@ -198,42 +199,41 @@ export function useGameEngine({ room, player, roomPlayers }) {
 
   const applyFertilizer = useCallback((grade) => {
     if (inventory[grade] <= 0 || hasEnded) return { ok: false, reason: 'empty' }
-    let result = { ok: false, reason: 'target' }
-
     if (selectedTarget.type === 'plot') {
-      setPlots((current) => current.map((plot) => {
-        if (plot.id !== selectedTarget.id || !plot.crop?.startedAt || plot.crop.fertilized) return plot
-        const config = CROPS.find((item) => item.id === plot.crop.cropId)
-        const newEnd = calculateFertilizedEndTime({
-          startedAt: plot.crop.startedAt,
-          totalSeconds: config.growSeconds,
-          grade,
-          now,
-        })
-        if (!newEnd) { result = { ok: false, reason: 'late' }; return plot }
-        result = { ok: true }
-        return { ...plot, crop: { ...plot.crop, endsAt: newEnd, fertilized: grade } }
-      }))
+      const target = plots.find((plot) => plot.id === selectedTarget.id)
+      if (!target?.crop?.startedAt || target.crop.fertilized) return { ok: false, reason: 'target' }
+      const config = CROPS.find((item) => item.id === target.crop.cropId)
+      const newEnd = calculateFertilizedEndTime({
+        startedAt: target.crop.startedAt,
+        totalSeconds: config.growSeconds,
+        grade,
+        now,
+      })
+      if (!newEnd) return { ok: false, reason: 'late' }
+      setPlots((current) => current.map((plot) => (
+        plot.id === selectedTarget.id
+          ? { ...plot, crop: { ...plot.crop, endsAt: newEnd, fertilized: grade } }
+          : plot
+      )))
     } else {
-      setTrees((current) => current.map((tree) => {
-        if (tree.instanceId !== selectedTarget.id || tree.fertilized) return tree
-        const config = TREES.find((item) => item.id === tree.treeId)
-        const newEnd = calculateFertilizedEndTime({
-          startedAt: tree.startedAt,
-          totalSeconds: config.cycleSeconds,
-          grade,
-          isTree: true,
-          now,
-        })
-        if (!newEnd) { result = { ok: false, reason: 'late' }; return tree }
-        result = { ok: true }
-        return { ...tree, endsAt: newEnd, fertilized: grade }
-      }))
+      const target = trees.find((tree) => tree.instanceId === selectedTarget.id)
+      if (!target || target.fertilized) return { ok: false, reason: 'target' }
+      const config = TREES.find((item) => item.id === target.treeId)
+      const newEnd = calculateFertilizedEndTime({
+        startedAt: target.startedAt,
+        totalSeconds: config.cycleSeconds,
+        grade,
+        isTree: true,
+        now,
+      })
+      if (!newEnd) return { ok: false, reason: 'late' }
+      setTrees((current) => current.map((tree) => (
+        tree.instanceId === selectedTarget.id ? { ...tree, endsAt: newEnd, fertilized: grade } : tree
+      )))
     }
-
-    if (result.ok) setInventory((current) => ({ ...current, [grade]: current[grade] - 1 }))
-    return result
-  }, [hasEnded, inventory, now, selectedTarget])
+    setInventory((current) => ({ ...current, [grade]: current[grade] - 1 }))
+    return { ok: true }
+  }, [hasEnded, inventory, now, plots, selectedTarget, trees])
 
   const awardFertilizer = useCallback((grade, responseTime) => {
     setInventory((current) => ({ ...current, [grade]: current[grade] + 1 }))

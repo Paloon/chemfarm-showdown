@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { ActionBar } from '../components/game/ActionBar.jsx'
+import { EndGameModal } from '../components/game/EndGameModal.jsx'
 import { FarmGrid } from '../components/game/FarmGrid.jsx'
 import { InventoryModal } from '../components/game/InventoryModal.jsx'
 import { SeedShopModal } from '../components/game/SeedShopModal.jsx'
@@ -8,7 +9,7 @@ import { QuizModal } from '../components/quiz/QuizModal.jsx'
 import { useGameEngine } from '../hooks/useGameEngine.js'
 import { useQuizGame } from '../hooks/useQuizGame.js'
 
-export function FarmScreen({ room, player, players }) {
+export function FarmScreen({ room, player, players, onReplay }) {
   const game = useGameEngine({ room, player, roomPlayers: players })
   const quiz = useQuizGame({ playerId: player.id, onAward: game.awardFertilizer })
   const [modal, setModal] = useState(null)
@@ -98,6 +99,14 @@ export function FarmScreen({ room, player, players }) {
           score={quiz.roundScore}
           onSubmit={quiz.submitAnswer}
           onClose={quiz.closeQuiz}
+        />
+      )}
+      {game.hasEnded && (
+        <EndGameModal
+          leaderboard={game.leaderboard}
+          playerId={player.id}
+          localStats={game.stats}
+          onReplay={onReplay}
         />
       )}
     </main>

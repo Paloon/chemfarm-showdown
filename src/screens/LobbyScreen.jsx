@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import QRCode from 'qrcode'
 import { Brand } from '../components/Brand.jsx'
 
 export function LobbyScreen({ room, player, players, onReady, onStart, onLeave, isLoading, error, isOnline }) {
@@ -9,8 +8,9 @@ export function LobbyScreen({ room, player, players, onReady, onStart, onLeave, 
   const everyoneReady = players.length > 0 && players.every((item) => item.is_ready || item.id === room.host_player_id)
 
   useEffect(() => {
-    QRCode.toDataURL(roomUrl, { width: 240, margin: 1, color: { dark: '#2f3b25', light: '#fffaf0' } })
-      .then(setQrUrl)
+    import('qrcode').then(({ default: QRCode }) => (
+      QRCode.toDataURL(roomUrl, { width: 240, margin: 1, color: { dark: '#2f3b25', light: '#fffaf0' } })
+    )).then(setQrUrl)
   }, [roomUrl])
 
   const copyCode = async () => {
@@ -65,7 +65,7 @@ export function LobbyScreen({ room, player, players, onReady, onStart, onLeave, 
           {isHost || !isOnline ? (
             <button
               className="game-button game-button--primary"
-              disabled={isLoading || (isOnline && !everyoneReady)}
+              disabled={isLoading || (isOnline && (!everyoneReady || players.length < 2))}
               onClick={onStart}
             >
               {isLoading ? 'กำลังเริ่มเกม…' : 'เริ่มการแข่งขัน'}

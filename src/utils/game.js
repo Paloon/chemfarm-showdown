@@ -15,6 +15,17 @@ export function makeRoomCode() {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
 
+export function makeId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
+    const random = Math.floor(Math.random() * 16)
+    const value = character === 'x' ? random : (random & 0x3) | 0x8
+    return value.toString(16)
+  })
+}
+
 export function calculateFertilizedEndTime({ startedAt, totalSeconds, grade, isTree = false, now = Date.now() }) {
   const cutRatio = isTree ? FERTILIZER[grade].treeCut : FERTILIZER[grade].cropCut
   const totalMs = totalSeconds * 1000

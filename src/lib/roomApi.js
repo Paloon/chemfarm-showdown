@@ -1,6 +1,6 @@
 import { MATCH_DURATION_SECONDS, STARTING_CASH } from '../data/gameConfig.js'
 import { isSupabaseConfigured, supabase } from './supabase.js'
-import { makeRoomCode } from '../utils/game.js'
+import { makeId, makeRoomCode } from '../utils/game.js'
 
 async function uniqueRoomCode() {
   for (let attempt = 0; attempt < 8; attempt += 1) {
@@ -24,7 +24,7 @@ export async function createRoom(nickname) {
 
   const { data: player, error: playerError } = await supabase
     .from('players')
-    .insert({ room_id: room.id, nickname, cash: STARTING_CASH, is_host: true })
+    .insert({ room_id: room.id, nickname, cash: STARTING_CASH, is_host: true, is_ready: true })
     .select()
     .single()
   if (playerError) throw playerError
@@ -79,6 +79,13 @@ export async function startRoom(roomId) {
   return data
 }
 
+export async function resetRoom(roomId) {
+  if (!isSupabaseConfigured) return { status: 'lobby', started_at: null, ends_at: null }
+  const { data, error } = await supabase.rpc('reset_room', { target_room_id: roomId })
+  if (error) throw error
+  return Array.isArray(data) ? data[0] : data
+}
+
 export async function fetchServerTime() {
   if (!isSupabaseConfigured) return Date.now()
   const { data, error } = await supabase.rpc('get_server_time')
@@ -106,8 +113,8 @@ export async function updatePlayerStats(playerId, stats) {
 }
 
 function createDemoRoom(nickname, isHost, requestedCode) {
-  const roomId = crypto.randomUUID()
-  const playerId = crypto.randomUUID()
+  const roomId = makeId()
+  const playerId = makeId()
   return {
     room: {
       id: roomId,
@@ -122,7 +129,7 @@ function createDemoRoom(nickname, isHost, requestedCode) {
       cash: STARTING_CASH,
       fertilizer_s_count: 0,
       fertilizer_a_count: 0,
-      is_ready: false,
+      is_ready: isHost,
       is_host: isHost,
     },
   }
