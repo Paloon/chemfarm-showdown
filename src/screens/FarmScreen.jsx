@@ -4,10 +4,13 @@ import { FarmGrid } from '../components/game/FarmGrid.jsx'
 import { InventoryModal } from '../components/game/InventoryModal.jsx'
 import { SeedShopModal } from '../components/game/SeedShopModal.jsx'
 import { TopHud } from '../components/game/TopHud.jsx'
+import { QuizModal } from '../components/quiz/QuizModal.jsx'
 import { useGameEngine } from '../hooks/useGameEngine.js'
+import { useQuizGame } from '../hooks/useQuizGame.js'
 
 export function FarmScreen({ room, player, players }) {
   const game = useGameEngine({ room, player, roomPlayers: players })
+  const quiz = useQuizGame({ playerId: player.id, onAward: game.awardFertilizer })
   const [modal, setModal] = useState(null)
   const [toast, setToast] = useState('')
   const [inventoryMessage, setInventoryMessage] = useState('')
@@ -64,9 +67,11 @@ export function FarmScreen({ room, player, players }) {
       <ActionBar
         onSeeds={() => setModal('shop')}
         onWater={water}
-        onLab={() => showToast('ห้องวิจัยกำลังเปิด…')}
+        onLab={() => {
+          if (!quiz.openQuiz()) showToast(`ห้องวิจัยกำลังพัก รออีก ${quiz.cooldown} วินาที`)
+        }}
         onInventory={() => { setInventoryMessage(''); setModal('inventory') }}
-        cooldown={0}
+        cooldown={quiz.cooldown}
         inventoryTotal={game.inventory.S + game.inventory.A}
       />
 
@@ -81,6 +86,18 @@ export function FarmScreen({ room, player, players }) {
           onApply={applyFertilizer}
           message={inventoryMessage}
           onClose={() => setModal(null)}
+        />
+      )}
+      {quiz.activeQuestion && (
+        <QuizModal
+          question={quiz.activeQuestion}
+          elapsedMs={quiz.elapsedMs}
+          fastLimitMs={quiz.fastLimitMs}
+          attemptLimitMs={quiz.attemptLimitMs}
+          feedback={quiz.feedback}
+          score={quiz.roundScore}
+          onSubmit={quiz.submitAnswer}
+          onClose={quiz.closeQuiz}
         />
       )}
     </main>
