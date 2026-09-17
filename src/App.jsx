@@ -1,6 +1,7 @@
 import { useRoom } from './hooks/useRoom.js'
 import { LandingScreen } from './screens/LandingScreen.jsx'
 import { LobbyScreen } from './screens/LobbyScreen.jsx'
+import { FarmScreen } from './screens/FarmScreen.jsx'
 
 function App() {
   const roomState = useRoom()
@@ -19,7 +20,7 @@ function App() {
   }
 
   if (room.status === 'playing') {
-    return <main className="loading-screen">กำลังเตรียมแปลงฟาร์ม…</main>
+    return <FarmScreen room={room} player={player} players={roomState.players} />
   }
 
   return (
