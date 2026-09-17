@@ -131,7 +131,7 @@ export function useRoom() {
 
     const refreshPlayers = async () => {
       const { data } = await supabase
-        .from('players')
+        .from('chemfarm_players')
         .select('*')
         .eq('room_id', room.id)
         .order('joined_at')
@@ -143,12 +143,12 @@ export function useRoom() {
       .channel(`lobby:${room.id}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'players', filter: `room_id=eq.${room.id}` },
+        { event: '*', schema: 'public', table: 'chemfarm_players', filter: `room_id=eq.${room.id}` },
         refreshPlayers,
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${room.id}` },
+        { event: 'UPDATE', schema: 'public', table: 'chemfarm_rooms', filter: `id=eq.${room.id}` },
         ({ new: nextRoom }) => setRoom(nextRoom),
       )
       .subscribe()

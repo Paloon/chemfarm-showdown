@@ -64,7 +64,9 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Schema เปิด Realtime ให้ `rooms` และ `players` อัตโนมัติ ส่วนข้อมูลเงินระหว่างเกมใช้ Realtime Broadcast แยกตาม room id
+Schema เปิด Realtime ให้ `chemfarm_rooms` และ `chemfarm_players` อัตโนมัติ ส่วนข้อมูลเงินระหว่างเกมใช้ Realtime Broadcast แยกตาม room id
+
+ตารางของเกมใช้คำนำหน้า `chemfarm_` เช่น `chemfarm_rooms` และ `chemfarm_players` เพื่อไม่ชนกับตารางของโปรเจกต์อื่นใน Supabase เดียวกัน
 
 > นโยบาย RLS ในโปรเจกต์นี้ตั้งใจให้ผู้เล่น anonymous ใช้งานได้โดยไม่มีระบบ anti-cheat ตามขอบเขตเกม หากนำไปใช้กับคะแนนหรือรางวัลจริงควรเพิ่ม Supabase Auth และย้ายการคำนวณเงินไปไว้ใน Edge Functions
 

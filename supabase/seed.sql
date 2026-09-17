@@ -1,6 +1,6 @@
 -- Run after schema.sql. All answers are integers and all questions are fixed.
 
-insert into public.quiz_questions (id, type, question_data, answer) values
+insert into public.chemfarm_quiz_questions (id, type, question_data, answer) values
 ('10000000-0000-0000-0000-000000000001','rate_table','{"tableData":[{"expId":1,"A":0.1,"B":0.1,"rate":2},{"expId":2,"A":0.2,"B":0.1,"rate":4},{"expId":3,"A":0.1,"B":0.2,"rate":4}]}','{"m":1,"n":1}'),
 ('10000000-0000-0000-0000-000000000002','rate_table','{"tableData":[{"expId":1,"A":0.1,"B":0.1,"rate":1},{"expId":2,"A":0.2,"B":0.1,"rate":4},{"expId":3,"A":0.1,"B":0.2,"rate":2}]}','{"m":2,"n":1}'),
 ('10000000-0000-0000-0000-000000000003','rate_table','{"tableData":[{"expId":1,"A":0.1,"B":0.1,"rate":3},{"expId":2,"A":0.2,"B":0.1,"rate":6},{"expId":3,"A":0.1,"B":0.2,"rate":12}]}','{"m":1,"n":2}'),
