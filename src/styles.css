@@ -1,7 +1,9 @@
 :root {
-  font-family: Inter, system-ui, sans-serif;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   color: #17211a;
-  background: #f4f7f3;
+  background: #f0f4ed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -14,6 +16,9 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(187, 255, 84, 0.2), transparent 28rem),
+    linear-gradient(135deg, #f8faf5 0%, #edf3e8 100%);
 }
 
 button,
@@ -23,19 +28,336 @@ select {
   font: inherit;
 }
 
-main {
-  display: grid;
+.app-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  place-content: center;
-  padding: 2rem;
-  text-align: center;
+}
+
+.site-header,
+.hero,
+footer {
+  width: min(1180px, calc(100% - 3rem));
+  margin-inline: auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1.5rem;
+  border-bottom: 1px solid rgba(23, 33, 26, 0.12);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: inherit;
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: #d7ff61;
+  background: #17211a;
+  border-radius: 50% 50% 50% 0;
+  place-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  transform: rotate(-12deg);
+}
+
+.brand-mark::first-line {
+  transform: rotate(12deg);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  color: #405048;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(23, 33, 26, 0.1);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  backdrop-filter: blur(12px);
+}
+
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #69b526;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(105, 181, 38, 0.12);
+}
+
+.hero {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.45fr) minmax(290px, 0.75fr);
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: center;
+  padding-block: clamp(4.5rem, 10vw, 8rem);
+}
+
+.hero-copy {
+  max-width: 720px;
+}
+
+.eyebrow {
+  margin: 0 0 1.25rem;
+  color: #5d783e;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(2.25rem, 8vw, 5rem);
+  max-width: 10ch;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
 }
 
-p {
+h1 span {
+  color: #80bd32;
+}
+
+.hero-description {
+  max-width: 590px;
+  margin: 2rem 0 0;
   color: #536258;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.75;
+}
+
+code {
+  padding: 0.15rem 0.35rem;
+  color: #29421e;
+  background: rgba(128, 189, 50, 0.12);
+  border-radius: 0.35rem;
+  font-size: 0.9em;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2.25rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.8rem 1.15rem;
+  border: 1px solid #17211a;
+  border-radius: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.button:focus-visible,
+.brand:focus-visible {
+  outline: 3px solid rgba(128, 189, 50, 0.45);
+  outline-offset: 3px;
+}
+
+.button-primary {
+  color: #f8fff2;
+  background: #17211a;
+  box-shadow: 0 10px 30px rgba(23, 33, 26, 0.18);
+}
+
+.button-secondary {
+  color: #17211a;
+  background: transparent;
+}
+
+.lab-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: #17211a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.6rem;
+  color: #f7fbf4;
+  box-shadow: 0 30px 80px rgba(25, 47, 28, 0.2);
+}
+
+.lab-card::before {
+  position: absolute;
+  top: -6rem;
+  right: -6rem;
+  width: 13rem;
+  height: 13rem;
+  background: rgba(182, 255, 74, 0.14);
+  border-radius: 50%;
+  content: '';
+  filter: blur(4px);
+}
+
+.lab-card-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #c2ccbf;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lab-card-icon {
+  color: #b6ff4a;
+  font-size: 1.6rem;
+}
+
+.score-ring {
+  display: grid;
+  width: 11rem;
+  height: 11rem;
+  margin: 2.5rem auto;
+  background: conic-gradient(#b6ff4a 0 100%, rgba(255, 255, 255, 0.1) 0);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.score-ring::before {
+  grid-area: 1 / 1;
+  width: 8.75rem;
+  height: 8.75rem;
+  background: #17211a;
+  border-radius: inherit;
+  content: '';
+}
+
+.score-ring div {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-ring strong {
+  font-size: 2.75rem;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.score-ring span {
+  margin-top: 0.3rem;
+  color: #9dac99;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.check-list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 1.25rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  list-style: none;
+}
+
+.check-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #cbd5c8;
+  font-size: 0.85rem;
+}
+
+.check-list li span {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #17211a;
+  background: #b6ff4a;
+  border-radius: 50%;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 1.35rem;
+  border-top: 1px solid rgba(23, 33, 26, 0.12);
+  color: #6a776e;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 780px) {
+  .site-header,
+  .hero,
+  footer {
+    width: min(100% - 2rem, 620px);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+    padding-block: 4rem;
+  }
+
+  .hero-copy {
+    text-align: center;
+  }
+
+  h1,
+  .hero-description {
+    margin-inline: auto;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-pill {
+    font-size: 0;
+  }
+
+  .status-pill::after {
+    font-size: 0.72rem;
+    content: 'Ready';
+  }
+
+  h1 {
+    font-size: clamp(3.2rem, 18vw, 4.5rem);
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  footer {
+    gap: 1rem;
+  }
 }
