@@ -142,6 +142,8 @@ button:focus-visible, input:focus-visible { outline: 4px solid rgba(240, 154, 49
 .final-board dl div { padding: .3rem; background: rgba(255,255,255,.42); border-radius: .4rem; text-align: center; }
 .final-board dt { color: #8b7d66; font-size: .57rem; }.final-board dd { margin: 0; font-size: .68rem; font-weight: 800; }.end-modal > .game-button { width: 100%; }
 
+.feedback-close { position: relative; z-index: 2; min-width: 170px; min-height: 44px; margin-top: 1rem; color: #3b2b1f; background: #fff2cf; border: 2px solid #fff; border-radius: .6rem; cursor: pointer; font-weight: 900; }
+
 @media (min-width: 760px) { .lobby-screen { padding: 2rem; }.lobby-layout { grid-template-columns: minmax(17rem,.8fr) minmax(22rem,1.2fr); align-items: stretch; }.room-ticket, .players-panel { padding: 2rem; } }
 @media (max-width: 390px) { .landing-card { border-radius: 1.5rem; }.landing-hero-art { min-height: 5.2rem; font-size: 2.8rem; }.landing-hero-art span:nth-child(2) { font-size: 4.2rem; }.player-list li { grid-template-columns: 40px 1fr; }.ready-state { grid-column: 2; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

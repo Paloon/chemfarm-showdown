@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { EnergyGraphQuestion } from './EnergyGraphQuestion.jsx'
 import { RateTableQuestion } from './RateTableQuestion.jsx'
+import { createQuizAnswers } from '../../utils/quiz.js'
 
 export function QuizModal({ question, elapsedMs, fastLimitMs, attemptLimitMs, feedback, score, onSubmit, onClose }) {
   const isRate = question.type === 'rate_table'
-  const [answers, setAnswers] = useState(isRate ? { m: '', n: '' } : { EaForward: '', EaReverse: '' })
+  const [answers, setAnswers] = useState(() => createQuizAnswers(question))
   const sTimeLeft = Math.max(0, (fastLimitMs - elapsedMs) / 1000)
   const totalTimeLeft = Math.max(0, (attemptLimitMs - elapsedMs) / 1000)
   const fastProgress = Math.max(0, 1 - elapsedMs / fastLimitMs)
@@ -55,6 +56,7 @@ export function QuizModal({ question, elapsedMs, fastLimitMs, attemptLimitMs, fe
             ) : (
               <><span className="feedback-icon">×</span><strong>{feedback.timedOut ? 'หมดเวลาแล้ว' : 'ยังไม่ถูก ลองโจทย์ใหม่อีกครั้ง'}</strong></>
             )}
+            <button className="feedback-close" onClick={onClose}>กลับไปทำฟาร์ม</button>
           </div>
         )}
       </section>

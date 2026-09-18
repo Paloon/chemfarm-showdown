@@ -1,5 +1,7 @@
 export function EnergyGraphQuestion({ question, answers, onChange, feedback }) {
   const { reactantEnergy, peakEnergy, productEnergy } = question.question_data
+  const askedField = question.askedField
+  const isForward = askedField === 'EaForward'
   const maxEnergy = Math.max(peakEnergy * 1.18, 120)
   const y = (energy) => 188 - (energy / maxEnergy) * 145
   const reactantY = y(reactantEnergy)
@@ -9,7 +11,7 @@ export function EnergyGraphQuestion({ question, answers, onChange, feedback }) {
 
   return (
     <div className="energy-question">
-      <p className="question-prompt">คำนวณพลังงานก่อกัมมันต์</p>
+      <p className="question-prompt">คำนวณพลังงานก่อกัมมันต์ <strong>{isForward ? 'ไปข้างหน้า' : 'ย้อนกลับ'}</strong></p>
       <div className="energy-chart">
         <svg viewBox="0 0 290 225" role="img" aria-label="กราฟพลังงานของปฏิกิริยา">
           <defs><linearGradient id="energyLine" x1="0" x2="1"><stop stopColor="#76d2ed" /><stop offset=".55" stopColor="#f7c15a" /><stop offset="1" stopColor="#f16d4c" /></linearGradient></defs>
@@ -28,13 +30,9 @@ export function EnergyGraphQuestion({ question, answers, onChange, feedback }) {
         </svg>
       </div>
       <div className="answer-grid energy-answers">
-        <label className={feedback?.fields?.EaForward === false ? 'is-wrong' : feedback?.fields?.EaForward ? 'is-correct' : ''}>
-          <span>Ea ไปข้างหน้า (kJ):</span>
-          <span className="answer-input"><input autoFocus inputMode="numeric" pattern="-?[0-9]*" value={answers.EaForward} onChange={(event) => onChange('EaForward', event.target.value)} /><i /></span>
-        </label>
-        <label className={feedback?.fields?.EaReverse === false ? 'is-wrong' : feedback?.fields?.EaReverse ? 'is-correct' : ''}>
-          <span>Ea ย้อนกลับ (kJ):</span>
-          <span className="answer-input"><input inputMode="numeric" pattern="-?[0-9]*" value={answers.EaReverse} onChange={(event) => onChange('EaReverse', event.target.value)} /><i /></span>
+        <label className={feedback?.fields?.[askedField] === false ? 'is-wrong' : feedback?.fields?.[askedField] ? 'is-correct' : ''}>
+          <span>Ea {isForward ? 'ไปข้างหน้า' : 'ย้อนกลับ'} (kJ):</span>
+          <span className="answer-input"><input autoFocus inputMode="numeric" pattern="-?[0-9]*" value={answers[askedField]} onChange={(event) => onChange(askedField, event.target.value)} /><i /></span>
         </label>
       </div>
     </div>

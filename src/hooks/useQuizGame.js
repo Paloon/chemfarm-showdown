@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DEMO_QUESTIONS, QUIZ_COOLDOWN_SECONDS, QUIZ_FAST_LIMIT_MS } from '../data/gameConfig.js'
 import { fetchQuestions, recordQuizAttempt } from '../lib/roomApi.js'
+import { evaluateQuizAnswer, pickRandomQuizQuestion } from '../utils/quiz.js'
 
 const ATTEMPT_LIMIT_MS = 15000
 
@@ -38,6 +39,19 @@ export function useQuizGame({ playerId, onAward }) {
   }, [activeQuestion, feedback, startedAt])
 
   useEffect(() => {
+    if (!feedback) return undefined
+
+    window.clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = window.setTimeout(() => {
+      setActiveQuestion(null)
+      setStartedAt(null)
+      setFeedback(null)
+    }, feedback.correct ? 1800 : 1500)
+
+    return () => window.clearTimeout(closeTimerRef.current)
+  }, [feedback])
+
+  useEffect(() => {
     if (cooldown <= 0) return undefined
     const timer = window.setInterval(() => {
       setCooldown((current) => Math.max(0, current - 1))
@@ -49,7 +63,7 @@ export function useQuizGame({ playerId, onAward }) {
 
   const openQuiz = useCallback(() => {
     if (cooldown > 0 || !questions.length) return false
-    const nextQuestion = questions[Math.floor(Math.random() * questions.length)]
+    const nextQuestion = pickRandomQuizQuestion(questions)
     setActiveQuestion(nextQuestion)
     setStartedAt(Date.now())
     setElapsedMs(0)
@@ -67,11 +81,7 @@ export function useQuizGame({ playerId, onAward }) {
   const submitAnswer = useCallback((answers) => {
     if (!activeQuestion || feedback) return
     const responseTime = Date.now() - startedAt
-    const expected = activeQuestion.answer
-    const fieldResults = Object.fromEntries(
-      Object.keys(expected).map((key) => [key, Number(answers[key]) === Number(expected[key])]),
-    )
-    const isCorrect = Object.values(fieldResults).every(Boolean)
+    const { isCorrect, fieldResults } = evaluateQuizAnswer(activeQuestion, answers)
     const grade = isCorrect ? (responseTime <= QUIZ_FAST_LIMIT_MS ? 'S' : 'A') : null
 
     setElapsedMs(responseTime)
@@ -91,8 +101,7 @@ export function useQuizGame({ playerId, onAward }) {
       submitted_answer: answers,
     }).catch(() => {})
 
-    closeTimerRef.current = window.setTimeout(closeQuiz, isCorrect ? 1800 : 2400)
-  }, [activeQuestion, closeQuiz, feedback, onAward, playerId, startedAt])
+  }, [activeQuestion, feedback, onAward, playerId, startedAt])
 
   return {
     activeQuestion,

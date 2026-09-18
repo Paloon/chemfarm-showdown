@@ -7,6 +7,7 @@ import {
   getGrowthStage,
   makeId,
 } from '../src/utils/game.js'
+import { createQuizAnswers, evaluateQuizAnswer, pickRandomQuizQuestion } from '../src/utils/quiz.js'
 
 test('formats a five-minute match timer', () => {
   assert.equal(formatTimer(300), '05:00')
@@ -59,4 +60,19 @@ test('creates seven plots with only the first plot unlocked', () => {
 
 test('creates a browser-compatible unique identifier', () => {
   assert.match(makeId(), /^[0-9a-f-]{36}$/)
+})
+
+test('quiz asks only one randomly selected answer field', () => {
+  const questions = [{ id: 'rate', answer: { m: 2, n: 1 } }]
+  const selected = pickRandomQuizQuestion(questions, () => 0.99)
+
+  assert.equal(selected.askedField, 'n')
+  assert.deepEqual(createQuizAnswers(selected), { n: '' })
+})
+
+test('quiz evaluates only the field that was asked', () => {
+  const question = { askedField: 'm', answer: { m: 2, n: 1 } }
+
+  assert.equal(evaluateQuizAnswer(question, { m: '2' }).isCorrect, true)
+  assert.equal(evaluateQuizAnswer(question, { m: '1' }).isCorrect, false)
 })
