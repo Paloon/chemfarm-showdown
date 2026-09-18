@@ -28,7 +28,7 @@ create table if not exists public.chemfarm_players (
   id uuid primary key default gen_random_uuid(),
   room_id uuid not null references public.chemfarm_rooms(id) on delete cascade,
   nickname varchar(20) not null check (char_length(trim(nickname)) between 1 and 20),
-  cash integer not null default 100 check (cash >= 0),
+  cash integer not null default 120 check (cash >= 0),
   fertilizer_s_count integer not null default 0 check (fertilizer_s_count >= 0),
   fertilizer_a_count integer not null default 0 check (fertilizer_a_count >= 0),
   crops_harvested integer not null default 0,
@@ -39,7 +39,8 @@ create table if not exists public.chemfarm_players (
   joined_at timestamptz not null default now()
 );
 
-alter table public.chemfarm_players add column if not exists cash integer not null default 100;
+alter table public.chemfarm_players add column if not exists cash integer not null default 120;
+alter table public.chemfarm_players alter column cash set default 120;
 alter table public.chemfarm_players add column if not exists fertilizer_s_count integer not null default 0;
 alter table public.chemfarm_players add column if not exists fertilizer_a_count integer not null default 0;
 alter table public.chemfarm_players add column if not exists crops_harvested integer not null default 0;
@@ -141,7 +142,7 @@ set search_path = public
 as $$
 begin
   update public.chemfarm_players
-  set cash = 100,
+  set cash = 120,
       fertilizer_s_count = 0,
       fertilizer_a_count = 0,
       crops_harvested = 0,

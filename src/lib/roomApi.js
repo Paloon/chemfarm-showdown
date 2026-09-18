@@ -83,6 +83,11 @@ export async function resetRoom(roomId) {
   if (!isSupabaseConfigured) return { status: 'lobby', started_at: null, ends_at: null }
   const { data, error } = await supabase.rpc('reset_room', { target_room_id: roomId })
   if (error) throw error
+  const { error: playerResetError } = await supabase
+    .from('chemfarm_players')
+    .update({ cash: STARTING_CASH })
+    .eq('room_id', roomId)
+  if (playerResetError) throw playerResetError
   return Array.isArray(data) ? data[0] : data
 }
 

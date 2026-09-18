@@ -1,6 +1,6 @@
 export const MATCH_DURATION_SECONDS = 300
-export const STARTING_CASH = 100
-export const QUIZ_COOLDOWN_SECONDS = 10
+export const STARTING_CASH = 120
+export const QUIZ_COOLDOWN_SECONDS = 6
 export const QUIZ_FAST_LIMIT_MS = 5000
 
 export const CROPS = [
@@ -8,9 +8,9 @@ export const CROPS = [
     id: 'carrot',
     name: 'แครอทเคมี',
     icon: '🥕',
-    seedPrice: 10,
-    growSeconds: 15,
-    sellPrice: 20,
+    seedPrice: 8,
+    growSeconds: 8,
+    sellPrice: 18,
     accent: '#ff8b42',
     description: 'พืชเริ่มต้น หมุนเงินช่วงแรก',
   },
@@ -18,9 +18,9 @@ export const CROPS = [
     id: 'corn',
     name: 'ข้าวโพดไฮสปีด',
     icon: '🌽',
-    seedPrice: 35,
-    growSeconds: 30,
-    sellPrice: 80,
+    seedPrice: 25,
+    growSeconds: 15,
+    sellPrice: 58,
     accent: '#f4c542',
     description: 'เหมาะกับปุ๋ยจากโจทย์ตาราง',
   },
@@ -28,9 +28,9 @@ export const CROPS = [
     id: 'tomato',
     name: 'มะเขือเทศพลังงาน',
     icon: '🍅',
-    seedPrice: 80,
-    growSeconds: 50,
-    sellPrice: 200,
+    seedPrice: 60,
+    growSeconds: 28,
+    sellPrice: 150,
     accent: '#e85845',
     description: 'กำไรสูง คุ้มค่ากับปุ๋ยกราฟ',
   },
@@ -38,9 +38,9 @@ export const CROPS = [
     id: 'pumpkin',
     name: 'ฟักทองโมลาร์ยักษ์',
     icon: '🎃',
-    seedPrice: 200,
-    growSeconds: 90,
-    sellPrice: 550,
+    seedPrice: 150,
+    growSeconds: 50,
+    sellPrice: 420,
     accent: '#e68128',
     description: 'กำไรก้อนใหญ่สำหรับช่วงท้ายเกม',
   },
@@ -52,28 +52,28 @@ export const TREES = [
     name: 'ต้นแอปเปิลธรรมดา',
     icon: '🍎',
     price: 0,
-    cycleSeconds: 40,
-    sellPrice: 15,
+    cycleSeconds: 15,
+    sellPrice: 12,
   },
   {
     id: 'orange',
     name: 'ต้นส้ม Ep',
     icon: '🍊',
-    price: 150,
-    cycleSeconds: 60,
-    sellPrice: 35,
+    price: 90,
+    cycleSeconds: 24,
+    sellPrice: 32,
   },
   {
     id: 'durian',
     name: 'ต้นทุเรียนโอเวอร์คล็อก',
     icon: '🌳',
-    price: 400,
-    cycleSeconds: 90,
-    sellPrice: 110,
+    price: 240,
+    cycleSeconds: 38,
+    sellPrice: 95,
   },
 ]
 
-export const PLOT_PRICES = [0, 50, 120, 250, 400, 600, 850]
+export const PLOT_PRICES = [0, 35, 80, 150, 250, 380, 540]
 
 export const FERTILIZER = {
   S: { cropCut: 0.7, treeCut: 0.4, label: 'ปุ๋ยเกรด S' },

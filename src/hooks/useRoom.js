@@ -8,6 +8,7 @@ import {
 } from '../lib/roomApi.js'
 import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
 import { savePlayerSession } from '../lib/storage.js'
+import { STARTING_CASH } from '../data/gameConfig.js'
 
 function thaiError(error, fallback) {
   return /[\u0E00-\u0E7F]/.test(error?.message || '') ? error.message : fallback
@@ -35,7 +36,7 @@ export function useRoom() {
               {
                 id: 'demo-host',
                 nickname: 'เจ้าของห้อง',
-                cash: 100,
+                cash: STARTING_CASH,
                 is_ready: true,
                 is_host: true,
               },
@@ -112,9 +113,16 @@ export function useRoom() {
     try {
       const nextRoom = await resetRoomRequest(room.id)
       setRoom((current) => ({ ...current, ...nextRoom }))
+      setPlayer((current) => current ? {
+        ...current,
+        cash: STARTING_CASH,
+        is_ready: current.id === room.host_player_id,
+        fertilizer_s_count: 0,
+        fertilizer_a_count: 0,
+      } : current)
       setPlayers((current) => current.map((item) => ({
         ...item,
-        cash: 100,
+        cash: STARTING_CASH,
         is_ready: item.id === room.host_player_id,
         fertilizer_s_count: 0,
         fertilizer_a_count: 0,
