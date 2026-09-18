@@ -1,8 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { TREES } from '../src/data/gameConfig.js'
 import {
   calculateFertilizedEndTime,
+  collectReadyProduction,
   createInitialPlots,
+  createInitialTrees,
   formatTimer,
   getGrowthStage,
   makeId,
@@ -47,6 +50,30 @@ test('tree fertilizer is capped at a 40 percent cut', () => {
     now: startedAt + 10_000,
   })
   assert.equal(endTime, startedAt + 60_000)
+})
+
+test('collects tree income exactly when a production cycle finishes', () => {
+  const now = 100_000
+  const starter = TREES.find((tree) => tree.id === 'apple')
+  const trees = createInitialTrees(now - starter.cycleSeconds * 1000)
+  const result = collectReadyProduction({ plots: createInitialPlots(), trees, now })
+
+  assert.equal(result.treeGain, starter.sellPrice)
+  assert.equal(result.totalGain, starter.sellPrice)
+  assert.equal(result.harvestedTreeCycles, 1)
+  assert.equal(result.trees[0].endsAt, now + starter.cycleSeconds * 1000)
+})
+
+test('collects every missed tree cycle without duplicating income', () => {
+  const starter = TREES.find((tree) => tree.id === 'apple')
+  const trees = createInitialTrees(0)
+  const threeCycles = starter.cycleSeconds * 3 * 1000
+  const first = collectReadyProduction({ plots: createInitialPlots(), trees, now: threeCycles })
+  const second = collectReadyProduction({ plots: first.plots, trees: first.trees, now: threeCycles })
+
+  assert.equal(first.treeGain, starter.sellPrice * 3)
+  assert.equal(first.harvestedTreeCycles, 3)
+  assert.equal(second.treeGain, 0)
 })
 
 test('creates seven plots with only the first plot unlocked', () => {

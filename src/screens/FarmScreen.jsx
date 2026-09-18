@@ -53,7 +53,7 @@ export function FarmScreen({ room, player, players, onReplay }) {
 
   return (
     <main className="farm-screen screen-fade">
-      <TopHud cash={game.cash} secondsLeft={game.secondsLeft} leaderboard={game.leaderboard} playerId={player.id} />
+      <TopHud cash={game.cash} incomeNotice={game.incomeNotice} secondsLeft={game.secondsLeft} leaderboard={game.leaderboard} playerId={player.id} />
       <FarmGrid
         plots={game.plots}
         trees={game.trees}

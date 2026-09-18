@@ -19,7 +19,7 @@ export function FarmGrid({ plots, trees, cash, now, selectedTarget, onSelect, on
               <span className="tree-crown" aria-hidden="true">{config.icon}</span>
               <span className="tile-name">{config.name}</span>
               <span className="grow-meter"><i style={{ width: `${progress * 100}%` }} /></span>
-              <small>{Math.max(0, Math.ceil((tree.endsAt - now) / 1000))} วิ</small>
+              <small>{Math.max(0, Math.ceil((tree.endsAt - now) / 1000))} วิ · +{formatCash(config.sellPrice)}</small>
               {tree.fertilized && <b className={`grade-badge grade-${tree.fertilized}`}>{tree.fertilized}</b>}
             </button>
           )

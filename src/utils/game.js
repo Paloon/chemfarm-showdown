@@ -1,4 +1,4 @@
-import { FERTILIZER } from '../data/gameConfig.js'
+import { CROPS, FERTILIZER, TREES } from '../data/gameConfig.js'
 
 export function formatCash(value) {
   return `$${Math.max(0, Math.floor(value)).toLocaleString('th-TH')}`
@@ -59,13 +59,61 @@ export function createInitialPlots() {
 }
 
 export function createInitialTrees(now = Date.now()) {
+  const starterTree = TREES.find((tree) => tree.id === 'apple')
   return [
     {
       instanceId: 'apple-starter',
       treeId: 'apple',
       startedAt: now,
-      endsAt: now + 40000,
+      endsAt: now + starterTree.cycleSeconds * 1000,
       fertilized: false,
     },
   ]
+}
+
+export function collectReadyProduction({ plots, trees, now }) {
+  let cropGain = 0
+  let treeGain = 0
+  let harvestedCrops = 0
+  let harvestedTreeCycles = 0
+  let plotsChanged = false
+  let treesChanged = false
+
+  const nextPlots = plots.map((plot) => {
+    if (!plot.crop?.endsAt || plot.crop.endsAt > now) return plot
+
+    const crop = CROPS.find((item) => item.id === plot.crop.cropId)
+    cropGain += crop.sellPrice
+    harvestedCrops += 1
+    plotsChanged = true
+    return { ...plot, crop: null }
+  })
+
+  const nextTrees = trees.map((tree) => {
+    if (tree.endsAt > now) return tree
+
+    const config = TREES.find((item) => item.id === tree.treeId)
+    const cycleMs = config.cycleSeconds * 1000
+    const completedCycles = Math.floor((now - tree.endsAt) / cycleMs) + 1
+    treeGain += config.sellPrice * completedCycles
+    harvestedTreeCycles += completedCycles
+    treesChanged = true
+
+    return {
+      ...tree,
+      startedAt: tree.endsAt + (completedCycles - 1) * cycleMs,
+      endsAt: tree.endsAt + completedCycles * cycleMs,
+      fertilized: false,
+    }
+  })
+
+  return {
+    plots: plotsChanged ? nextPlots : plots,
+    trees: treesChanged ? nextTrees : trees,
+    cropGain,
+    treeGain,
+    totalGain: cropGain + treeGain,
+    harvestedCrops,
+    harvestedTreeCycles,
+  }
 }

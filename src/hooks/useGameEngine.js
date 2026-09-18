@@ -4,6 +4,7 @@ import { fetchServerTime, updatePlayerStats } from '../lib/roomApi.js'
 import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
 import {
   calculateFertilizedEndTime,
+  collectReadyProduction,
   createInitialPlots,
   createInitialTrees,
   makeId,
@@ -24,12 +25,20 @@ export function useGameEngine({ room, player, roomPlayers }) {
     roomPlayers.map((item) => ({ id: item.id, nickname: item.nickname, cash: item.cash ?? 0 })),
   )
   const [stats, setStats] = useState({ cropsHarvested: 0, quizzesSolved: 0, bestQuizTime: null })
+  const [incomeNotice, setIncomeNotice] = useState(null)
   const channelRef = useRef(null)
   const endedAtRef = useRef(false)
+  const plotsRef = useRef(plots)
+  const treesRef = useRef(trees)
+  const incomeTimerRef = useRef(null)
 
   const endsAt = useMemo(() => new Date(room.ends_at).getTime(), [room.ends_at])
   const secondsLeft = Math.max(0, (endsAt - now) / 1000)
   const hasEnded = secondsLeft <= 0
+
+  useEffect(() => { plotsRef.current = plots }, [plots])
+  useEffect(() => { treesRef.current = trees }, [trees])
+  useEffect(() => () => window.clearTimeout(incomeTimerRef.current), [])
 
   useEffect(() => {
     let active = true
@@ -47,34 +56,31 @@ export function useGameEngine({ room, player, roomPlayers }) {
       setNow(tickNow)
       if (tickNow >= endsAt) return
 
-      let cropGain = 0
-      let harvested = 0
-      setPlots((current) => current.map((plot) => {
-        if (!plot.crop?.endsAt || plot.crop.endsAt > tickNow) return plot
-        const crop = CROPS.find((item) => item.id === plot.crop.cropId)
-        cropGain += crop.sellPrice
-        harvested += 1
-        return { ...plot, crop: null }
-      }))
+      const production = collectReadyProduction({
+        plots: plotsRef.current,
+        trees: treesRef.current,
+        now: tickNow,
+      })
 
-      let treeGain = 0
-      setTrees((current) => current.map((tree) => {
-        if (tree.endsAt > tickNow) return tree
-        const config = TREES.find((item) => item.id === tree.treeId)
-        const cycleMs = config.cycleSeconds * 1000
-        const completedCycles = Math.floor((tickNow - tree.endsAt) / cycleMs) + 1
-        treeGain += config.sellPrice * completedCycles
-        return {
-          ...tree,
-          startedAt: tree.endsAt + (completedCycles - 1) * cycleMs,
-          endsAt: tree.endsAt + completedCycles * cycleMs,
-          fertilized: false,
-        }
-      }))
-
-      if (cropGain + treeGain > 0) setCash((current) => current + cropGain + treeGain)
-      if (harvested > 0) {
-        setStats((current) => ({ ...current, cropsHarvested: current.cropsHarvested + harvested }))
+      if (production.plots !== plotsRef.current) {
+        plotsRef.current = production.plots
+        setPlots(production.plots)
+      }
+      if (production.trees !== treesRef.current) {
+        treesRef.current = production.trees
+        setTrees(production.trees)
+      }
+      if (production.totalGain > 0) {
+        setCash((current) => current + production.totalGain)
+        setIncomeNotice({ id: tickNow, amount: production.totalGain, fromTrees: production.treeGain })
+        window.clearTimeout(incomeTimerRef.current)
+        incomeTimerRef.current = window.setTimeout(() => setIncomeNotice(null), 1400)
+      }
+      if (production.harvestedCrops > 0) {
+        setStats((current) => ({
+          ...current,
+          cropsHarvested: current.cropsHarvested + production.harvestedCrops,
+        }))
       }
     }
 
@@ -248,6 +254,7 @@ export function useGameEngine({ room, player, roomPlayers }) {
 
   return {
     cash,
+    incomeNotice,
     plots,
     trees,
     inventory,
